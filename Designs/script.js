@@ -6,7 +6,6 @@ const forecastTemp = document.getElementById("forecastTemp")
 const forecastIcon = document.getElementById('forecastIcon')
 const dropdownCities = document.getElementById("dropdown-cities");
 
-
 let userPosition
 
 const API_URL =
@@ -142,11 +141,32 @@ const onCityChanged = (event) => {
   console.log('end onCityChanged')
 }
 
-const getDefaultCity = () => {
+/* const getDefaultCity = () => {
   console.log('start getDefaultCity')
   let cities = document.querySelectorAll('[data-cityname]');
   console.log('finished getDefaultCity')
   return cities[0].dataset.cityname; //dataset is an object with all data attributes inside https://www.w3schools.com/tags/att_global_data.asp
+} */
+
+const getDefaultCity = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const long = position.coords.longitude;
+      var API_LAT_LON = 
+				`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&APPID=5caaaf25021b2d7aa4d206126b6a3351`;
+				/* `http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${long}&appid=5caaaf25021b2d7aa4d206126b6a3351`; */
+      fetch(API_LAT_LON)
+				.then((res) => res.json())
+				.then((data) => {
+					console.log('The data with lat/long: ', data)
+					console.log(data.name)   //the name is found based on latitude/longitude. It doesn't get passed on to getData() though
+					return data.name;
+				})
+    }
+    )} else {
+			currentCity = 'Stockholm';
+  }
 }
 
 const initializeCitySelector = () => {
@@ -174,7 +194,8 @@ const getForecastForCity = (cityName, callbackFunction) => {
     .finally(() => console.log('Request done'));
 }
 
-const getLocation = () => {
+//'''''''''''''''''''This must move into get default city
+/* const getLocation = () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition)
   } else {
@@ -182,15 +203,16 @@ const getLocation = () => {
       'Geolocation is not supported by this browser'
     )
   }
-}
+} */
 
-const showPosition = (position) => {
+//'''''''''''''''''''This isn't needed
+/* const showPosition = (position) => {
   userPosition = {
     latitude: position.coords.latitude,
     longitude: position.coords.longitude
   }
   console.log('lat', position.coords.latitude, 'long', position.coords.longitude)
-}
+} */
 
 initializeCitySelector();
 let currentCity = getDefaultCity(); //a function to get default city 
